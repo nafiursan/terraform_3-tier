@@ -15,6 +15,30 @@ resource "aws_subnet" "public" {
       Name = "Public-${count.index + 1}" 
     }   
 }
+# Create private subnet
+resource "aws_subnet" "private" {
+    vpc_id = aws_vpc.main.id
+    count=length(var.priv_ciders) 
+    #count = var.subnet_count
+    cidr_block = var.priv_ciders[count.index]
+    availability_zone = local.azs[count.index]
+    tags ={
+      Name = "Private-${count.index + 1}" 
+    }   
+} 
+
+# Create DB subnet
+resource "aws_subnet" "db" {
+    vpc_id = aws_vpc.main.id
+    count=length(var.db_ciders) 
+    #count = var.subnet_count
+    cidr_block = var.db_ciders[count.index]
+    availability_zone = local.azs[count.index]
+    tags ={
+      Name = "db-${count.index + 1}" 
+    }   
+} 
+
 
 # output "availability_zone_names" {    
 #   value = aws_vpc.main.cidr_block
@@ -56,7 +80,6 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
-
 #create aws instance in each subnet
 resource "aws_instance" "main" {
     ami = "ami-02daa508cbc334270"
@@ -68,13 +91,33 @@ resource "aws_instance" "main" {
         tags ={
       Name = "new-${count.index + 1}" 
     } 
+
     vpc_security_group_ids = [ aws_security_group.allow_tls.id ]
     user_data = <<-EOF
-              #!/bin/bash         
-              sudo yum update -y 
-              sudo yum install docker -y
-              sudo systemctl start docker
-              sudo docker run -p 80:8000 -d zuheb/django_blog
+              #!/bin/bash
+              # Created by NR
+              # date: 10-03-2023  
+              sudo amazon-linux-extras enable php8.0
+              sudo amazon-linux-extras install php8.0 -y
+              sudo yum install php-xml -y
+              sudo yum install php-mbstring -y
+              sudo yum install mysql -y
+
+              sudo curl -sS https://getcomposer.org/installer | sudo php
+              sudo mv composer.phar /usr/local/bin/composer
+              sudo ln -s /usr/local/bin/composer /usr/bin/composer
+
+              sudo yum install git -y
+              git clone https://github.com/nafiurrashid/multiuser-blog.git
+              cd multiuser-blog/
+              sudo composer install
+              sudo cp .env.example  .env
+              #-------------------       
+              # sudo yum update -y 
+              # sudo yum install docker -y
+              # sudo systemctl start docker
+              # sudo docker run -p 80:8000 -d zuheb/django_blog
+              #----------------------
               # sudo yum install -y amazon-linux-extras
               # sudo amazon-linux-extras enable nginx1
               # sudo amazon-linux-extras install nginx1 -y
@@ -84,17 +127,13 @@ resource "aws_instance" "main" {
  
 } 
 
-resource "aws_subnet" "private" {
-    vpc_id = aws_vpc.main.id
-    count=length(var.priv_ciders) 
-    #count = var.subnet_count
-    cidr_block = var.priv_ciders[count.index]
-    availability_zone = local.azs[count.index]
-    tags ={
-      Name = "Private-${count.index + 1}" 
-    }   
-} 
 
+
+
+#---------------------------
+
+
+#----------------
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
@@ -116,14 +155,23 @@ resource "aws_security_group" "allow_tls" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+     ingress {
+    description = "Allow Port 8000 for output"
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   egress {
     from_port        = 0
     to_port          = 0
-    protocol         = "-1"
+    protocol         = -1
     cidr_blocks      = ["0.0.0.0/0"]
    
   }
+
 
   tags = {
     Name = "allow_tls"
@@ -166,7 +214,7 @@ resource "aws_lb" "test" {
 
 resource "aws_lb_listener" "tf_alb_listener" {
   load_balancer_arn = aws_lb.test.arn
-  port              = "80"
+  port              = "8000"
   protocol          = "HTTP"
 
   default_action {
@@ -175,13 +223,6 @@ resource "aws_lb_listener" "tf_alb_listener" {
   }
 }
 
-
-
-
-
-
-
-
 resource "aws_security_group" "allow_rds" {
   name        = "allow_rds"
   description = "Allow TLS inbound traffic"
@@ -189,8 +230,8 @@ resource "aws_security_group" "allow_rds" {
 
   ingress {
     description      = "TLS from VPC"
-    from_port        = 443
-    to_port          = 443
+    from_port        = 3306
+    to_port          = 3306
     protocol         = "tcp"
     cidr_blocks      = [aws_vpc.main.cidr_block]
     #ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
@@ -212,7 +253,7 @@ resource "aws_security_group" "allow_rds" {
 
 resource "aws_db_subnet_group" "default" {
   name       = "main"
-  subnet_ids = [for subnet in aws_subnet.public : subnet.id]
+  subnet_ids = [for subnet in aws_subnet.db : subnet.id]
 
   tags = {
     Name = "My DB subnet group"
@@ -220,16 +261,19 @@ resource "aws_db_subnet_group" "default" {
 }
 
 resource "aws_db_instance" "example" {
+  
   allocated_storage = 10
   engine = "mysql"
   engine_version = "8.0.33"
   instance_class = "db.t2.micro"
-  db_name = "my_rds_instance"
-  password = "qwerty12"
-  username = "nafiur"
+  db_name = var.db_name
+  password = var.db_pw
+  username = var.db_username
   skip_final_snapshot = true
   vpc_security_group_ids = [ aws_security_group.allow_rds.id ]
   db_subnet_group_name = aws_db_subnet_group.default.name
-
+  tags = {
+    Name = "larvel-db"
+  }
  
 }
