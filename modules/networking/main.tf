@@ -57,7 +57,6 @@ resource "aws_route_table_association" "public" {
 }
 
 
-
 #create aws instance in each subnet
 resource "aws_instance" "main" {
     ami = "ami-02daa508cbc334270"
@@ -85,16 +84,16 @@ resource "aws_instance" "main" {
  
 } 
 
-# resource "aws_subnet" "private" {
-#     vpc_id = aws_vpc.main.id
-#     count=length(var.priv_ciders) 
-#     #count = var.subnet_count
-#     cidr_block = var.priv_ciders[count.index]
-#     availability_zone = local.azs[count.index]
-#     tags ={
-#       Name = "Private-${count.index + 1}" 
-#     }   
-# } 
+resource "aws_subnet" "private" {
+    vpc_id = aws_vpc.main.id
+    count=length(var.priv_ciders) 
+    #count = var.subnet_count
+    cidr_block = var.priv_ciders[count.index]
+    availability_zone = local.azs[count.index]
+    tags ={
+      Name = "Private-${count.index + 1}" 
+    }   
+} 
 
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
@@ -174,4 +173,63 @@ resource "aws_lb_listener" "tf_alb_listener" {
     type             = "forward"
     target_group_arn = aws_lb_target_group.test.arn
   }
+}
+
+
+
+
+
+
+
+
+resource "aws_security_group" "allow_rds" {
+  name        = "allow_rds"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+    #ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_rds"
+  }
+}
+
+
+resource "aws_db_subnet_group" "default" {
+  name       = "main"
+  subnet_ids = [for subnet in aws_subnet.public : subnet.id]
+
+  tags = {
+    Name = "My DB subnet group"
+  }
+}
+
+resource "aws_db_instance" "example" {
+  allocated_storage = 10
+  engine = "mysql"
+  engine_version = "8.0.33"
+  instance_class = "db.t2.micro"
+  db_name = "my_rds_instance"
+  password = "qwerty12"
+  username = "nafiur"
+  skip_final_snapshot = true
+  vpc_security_group_ids = [ aws_security_group.allow_rds.id ]
+  db_subnet_group_name = aws_db_subnet_group.default.name
+
+ 
 }
