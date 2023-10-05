@@ -7,8 +7,7 @@ output "pub_sub_ids" {
     value = local.pub_sub_ids
 }
 
-output "priv_sub_ids" {
-    # value = aws_subnet.private.*.id
-    value = local.priv_sub_ids
+output "db_sub_ids" {
+    value = var.db_ciders
+  
 }
-

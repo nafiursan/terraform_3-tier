@@ -2,7 +2,7 @@
 
 resource "aws_security_group" "allow_rds" {
   name        = "allow_rds"
-  description = "Allow TLS inbound traffic"
+  description = "Allow 3306 inbound traffic"
   vpc_id      = aws_vpc.main.id
 
   ingress {
