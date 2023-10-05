@@ -4,8 +4,21 @@ module "networking" {
   vpc_cidr    = "10.200.0.0/16"
   pub_ciders  = ["10.200.0.0/24", "10.200.1.0/24"]
   priv_ciders = ["10.200.2.0/24", "10.200.3.0/24"]
-  db_ciders = ["10.200.4.0/24", "10.200.5.0/24"]
+  db_ciders   = ["10.200.4.0/24", "10.200.5.0/24"]
 }
+
+# module "ec2" {
+#   source = "./modules/ec2"
+#   ami_id ="ami-02daa508cbc334270"
+#   subnet_id = module.networking.pub_sub_ids
+
+# }
+
+# module "servers" {
+#   source = "./modules/servers"
+#   # subnet_id = module.networking.pub_sub_ids[count.index]
+
+# }
 
 # module "stage" {
 #   source     = "./modules/networking"

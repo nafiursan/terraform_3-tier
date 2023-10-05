@@ -1,17 +1,14 @@
+
 variable "vpc_cidr" {
     default = "10.0.0.0/16"
 }
 
 variable "vpc_tags" {
   default = {
-     Name= "nafiur_tag"
+     Name= "My_tag"
   }
 }
 
-# variable "subnet_count" {
-#   default = 2
-  
-# }
 variable "db_name" {
   default = "laravel"
   
