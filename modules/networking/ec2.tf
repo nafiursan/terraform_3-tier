@@ -1,6 +1,7 @@
 #create aws instance in each subnet
 resource "aws_instance" "main" {
-    ami = "ami-02daa508cbc334270"
+    # ami = "ami-02daa508cbc334270"
+    ami= data.aws_ami.amazon-linux-2-latest.image_id
     count = length(var.pub_ciders)
     subnet_id = local.pub_sub_ids[count.index]
     key_name                    = "naf"

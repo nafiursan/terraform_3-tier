@@ -1,6 +1,5 @@
 output "vpc_id" {
     value = aws_vpc.main.id
-    
 }
 
 output "pub_sub_ids" {
@@ -21,11 +20,10 @@ output "db_endpoint" {
 
 output "db_port" {
     value = aws_db_instance.example.port
-  
 }
+
 output "server_ips" {
   value = aws_instance.main.*.public_ip
-
 }
 
 output "azs" {
