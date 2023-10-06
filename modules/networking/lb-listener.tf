@@ -1,6 +1,6 @@
 resource "aws_lb_listener" "tf_alb_listener" {
   load_balancer_arn = aws_lb.test.arn
-  port              = "8000"
+  port              = var.port
   protocol          = "HTTP"
 
   default_action {

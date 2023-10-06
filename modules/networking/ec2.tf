@@ -15,21 +15,21 @@ resource "aws_instance" "main" {
               #!/bin/bash
               # Created by NR
               # date: 10-03-2023  
-              sudo amazon-linux-extras enable php8.0
-              sudo amazon-linux-extras install php8.0 -y
-              sudo yum install php-xml -y
-              sudo yum install php-mbstring -y
-              sudo yum install mysql -y
+              # sudo amazon-linux-extras enable php8.0
+              # sudo amazon-linux-extras install php8.0 -y
+              # sudo yum install php-xml -y
+              # sudo yum install php-mbstring -y
+              # sudo yum install mysql -y
 
-              sudo curl -sS https://getcomposer.org/installer | sudo php
-              sudo mv composer.phar /usr/local/bin/composer
-              sudo ln -s /usr/local/bin/composer /usr/bin/composer
+              # sudo curl -sS https://getcomposer.org/installer | sudo php
+              # sudo mv composer.phar /usr/local/bin/composer
+              # sudo ln -s /usr/local/bin/composer /usr/bin/composer
 
-              sudo yum install git -y
-              git clone https://github.com/nafiurrashid/multiuser-blog.git
-              cd multiuser-blog/
-              sudo composer install
-              sudo cp .env.example  .env
+              # sudo yum install git -y
+              # git clone https://github.com/nafiurrashid/multiuser-blog.git
+              # cd multiuser-blog/
+              # sudo composer install
+              # sudo cp .env.example  .env
               #-------------------       
               # sudo yum update -y 
               # sudo yum install docker -y

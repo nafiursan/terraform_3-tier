@@ -1,9 +1,9 @@
 
 resource "aws_db_instance" "example" {
   
-  allocated_storage = 10
-  engine = "mysql"
-  engine_version = "8.0.33"
+  allocated_storage = var.db_allocated_space
+  engine = var.db_engine
+  engine_version = var.db_engine_version
   instance_class = var.instance_class
   db_name = var.db_name
   password = var.db_pw

@@ -1,5 +1,4 @@
 
-
 resource "aws_security_group" "allow_rds" {
   name        = "allow_rds"
   description = "Allow 3306 inbound traffic"
@@ -11,7 +10,6 @@ resource "aws_security_group" "allow_rds" {
     to_port          = 3306
     protocol         = "tcp"
     cidr_blocks      = [aws_vpc.main.cidr_block]
-    #ipv6_cidr_blocks = [aws_vpc.main.ipv6_cidr_block]
   }
 
   egress {

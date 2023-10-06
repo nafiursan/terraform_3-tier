@@ -5,14 +5,7 @@ resource "aws_lb" "test" {
   load_balancer_type = "application"
   security_groups    = [ aws_security_group.allow_alb.id ]
   subnets            = [for subnet in aws_subnet.public : subnet.id]
-
   enable_deletion_protection = false
-
-  # access_logs {
-  #   bucket  = aws_s3_bucket.lb_logs.id
-  #   prefix  = "test-lb"
-  #   enabled = true
-  # }
 
   tags = {
     Environment = "production"

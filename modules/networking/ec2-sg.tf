@@ -21,8 +21,8 @@ resource "aws_security_group" "allow_tls" {
 
      ingress {
     description = "Allow Port 8000 for output"
-    from_port   = 8000
-    to_port     = 8000
+    from_port   = var.port
+    to_port     = var.port
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
