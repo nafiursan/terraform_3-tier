@@ -16,12 +16,12 @@ output "alb_endpoint" {
 
 output "db_endpoint" {
   value = module.networking.db_endpoint
-   #sensitive = true
+  #sensitive = true
 }
 
 output "db_port" {
   value = module.networking.db_port
-  
+
 }
 
 output "server_ips" {

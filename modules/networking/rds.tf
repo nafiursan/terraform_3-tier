@@ -16,3 +16,42 @@ resource "aws_db_instance" "example" {
   }
  
 }
+
+resource "aws_db_subnet_group" "default" {
+  name       = "main"
+  subnet_ids = [for subnet in aws_subnet.db : subnet.id]
+
+  tags = {
+    Name = "My DB subnet group"
+  }
+}
+
+################################################################################
+# Security Group
+################################################################################
+
+resource "aws_security_group" "allow_rds" {
+  name        = "allow_rds"
+  description = "Allow 3306 inbound traffic"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description      = "TLS from VPC"
+    from_port        = 3306
+    to_port          = 3306
+    protocol         = "tcp"
+    cidr_blocks      = [aws_vpc.main.cidr_block]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "allow_rds"
+  }
+}
