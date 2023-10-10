@@ -14,6 +14,11 @@ variable "db_ciders" {
   type = list(string) 
 }
 
+variable "priv_ciders" {
+   default = ["10.0.20.0/24" , "10.0.21.0/24" ]
+   type = list(string) 
+}
+
 variable "port" {
   default = "8000"
   type        = string

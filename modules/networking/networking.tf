@@ -40,6 +40,21 @@ resource "aws_subnet" "public" {
 }
 
 ################################################################################
+# Create Private Subnet 
+################################################################################
+
+# Create Private Subnet
+resource "aws_subnet" "private" {
+    vpc_id = aws_vpc.this_vpc.id
+    count=length(var.priv_ciders) 
+    cidr_block = var.priv_ciders[count.index]
+    availability_zone = local.azs[count.index]
+    tags ={
+      Name = "Public-${count.index + 1}" 
+    }   
+}
+
+################################################################################
 # Create Internet Gateway
 ################################################################################
 
@@ -72,7 +87,7 @@ resource "aws_route_table" "public" {
 }
 
 ################################################################################
-# Associate Route-Tavle
+# Associate Route-Table
 ################################################################################
 
 # Associate route-Table with public subnet
