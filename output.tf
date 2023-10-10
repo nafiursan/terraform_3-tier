@@ -24,9 +24,9 @@ output "db_port" {
 
 }
 
-output "server_ips" {
-  value = module.networking.server_ips
-}
+# output "server_ips" {
+#   value = module.networking.server_ips
+# }
 
 output "azs" {
   value = module.networking.azs

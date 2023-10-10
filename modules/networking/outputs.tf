@@ -22,9 +22,9 @@ output "db_port" {
     value = aws_db_instance.example.port
 }
 
-output "server_ips" {
-  value = aws_instance.main.*.public_ip
-}
+# output "server_ips" {
+#   value = aws_instance.main.*.public_ip
+# }
 
 output "azs" {
   value = data.aws_availability_zones.az.names
