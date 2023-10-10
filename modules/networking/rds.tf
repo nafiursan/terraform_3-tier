@@ -12,6 +12,7 @@ resource "aws_db_instance" "example" {
   password = var.db_pw
   username = var.db_username
   skip_final_snapshot = true
+  multi_az = true
   vpc_security_group_ids = [ aws_security_group.allow_rds.id ]
   db_subnet_group_name = aws_db_subnet_group.default.name
   tags = {

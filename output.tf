@@ -1,3 +1,4 @@
+
 output "public_subnets" {
   value = module.networking.pub_sub_ids
 }
@@ -24,12 +25,9 @@ output "db_port" {
 
 }
 
-# output "server_ips" {
-#   value = module.networking.server_ips
-# }
-
 output "azs" {
   value = module.networking.azs
 }
+
 
 

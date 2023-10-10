@@ -17,7 +17,7 @@ resource "aws_lb" "test" {
 }
 
 ################################################################################
-# Load Balancer lListener 
+# Load Balancer Listener 
 ################################################################################
 
 resource "aws_lb_listener" "tf_alb_listener" {
@@ -45,11 +45,10 @@ resource "aws_lb_target_group" "test" {
 ################################################################################
 # Load Balancer - Target Group Attachment
 ################################################################################
-
-resource "aws_lb_target_group_attachment" "example" {
-  count            = length(var.pub_ciders) 
-  target_group_arn = aws_lb_target_group.test.arn
-  target_id        = aws_instance.main[count.index].id
+# Create a new ALB Target Group attachment
+resource "aws_autoscaling_attachment" "example" {
+  autoscaling_group_name = aws_autoscaling_group.bar.id
+  lb_target_group_arn    = aws_lb_target_group.test.arn
 }
 
 ################################################################################
@@ -62,7 +61,7 @@ resource "aws_security_group" "allow_alb" {
   vpc_id      = aws_vpc.this_vpc.id
 
   ingress {
-     from_port =80
+     from_port = 80
      to_port = 80
      protocol = "tcp"
      cidr_blocks = ["0.0.0.0/0"]
@@ -81,7 +80,6 @@ resource "aws_security_group" "allow_alb" {
     to_port          = 0
     protocol         = -1
     cidr_blocks      = ["0.0.0.0/0"]
-   
   }
 
   tags = {

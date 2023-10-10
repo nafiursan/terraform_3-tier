@@ -37,7 +37,7 @@ variable "db_engine_version" {
 
 variable "vpc_tags" {
   default = {
-     Name= "My_tag"
+     Name= "tf-vpc"
   }
 }
 
