@@ -1,6 +1,9 @@
 
+################################################################################
+# RDS Instance
+################################################################################
+
 resource "aws_db_instance" "example" {
-  
   allocated_storage = var.db_allocated_space
   engine = var.db_engine
   engine_version = var.db_engine_version
@@ -14,8 +17,11 @@ resource "aws_db_instance" "example" {
   tags = {
     Name = "larvel-db"
   }
- 
 }
+
+################################################################################
+# Database Subnet Group
+################################################################################
 
 resource "aws_db_subnet_group" "default" {
   name       = "main"
@@ -33,14 +39,14 @@ resource "aws_db_subnet_group" "default" {
 resource "aws_security_group" "allow_rds" {
   name        = "allow_rds"
   description = "Allow 3306 inbound traffic"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = aws_vpc.this_vpc.id
 
   ingress {
     description      = "TLS from VPC"
     from_port        = 3306
     to_port          = 3306
     protocol         = "tcp"
-    cidr_blocks      = [aws_vpc.main.cidr_block]
+    cidr_blocks      = [aws_vpc.this_vpc.cidr_block]
   }
 
   egress {

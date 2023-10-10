@@ -1,4 +1,8 @@
 
+################################################################################
+# Application Load balancer
+################################################################################
+
 resource "aws_lb" "test" {
   name               = "test-lb-tf"
   internal           = false
@@ -12,6 +16,10 @@ resource "aws_lb" "test" {
   }
 }
 
+################################################################################
+# Load Balancer lListener 
+################################################################################
+
 resource "aws_lb_listener" "tf_alb_listener" {
   load_balancer_arn = aws_lb.test.arn
   port              = var.port
@@ -23,27 +31,35 @@ resource "aws_lb_listener" "tf_alb_listener" {
   }
 }
 
+################################################################################
+# Target Group of the Load Balancer
+################################################################################
+
 resource "aws_lb_target_group" "test" {
   name     = "tf-example-lb-tg"
   port     = var.port
   protocol = "HTTP"
-  vpc_id   = aws_vpc.main.id
+  vpc_id   = aws_vpc.this_vpc.id
 }
+
+################################################################################
+# Load Balancer - Target Group Attachment
+################################################################################
 
 resource "aws_lb_target_group_attachment" "example" {
   count            = length(var.pub_ciders) 
   target_group_arn = aws_lb_target_group.test.arn
   target_id        = aws_instance.main[count.index].id
 }
+
 ################################################################################
 # Security Group
 ################################################################################
 
-
 resource "aws_security_group" "allow_alb" {
   name        = "allow_alb"
   description = "Allow alb inbound traffic"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = aws_vpc.this_vpc.id
 
   ingress {
      from_port =80

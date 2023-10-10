@@ -5,22 +5,18 @@ variable "vpc_cidr" {
 }
 
 variable "pub_ciders" {
-
    default = ["10.0.0.0/24" , "10.0.1.0/24" ]
-   type = list(string)
-  
+   type = list(string) 
 }
 
 variable "db_ciders" {
   default = ["10.0.10.0/24" , "10.0.11.0/24" ]
-  type = list(string)
-  
+  type = list(string) 
 }
 
 variable "port" {
   default = "8000"
   type        = string
-  
 }
 
 variable "db_allocated_space" {
@@ -32,20 +28,17 @@ variable "db_allocated_space" {
 variable "db_engine" {
   default = "mysql"
   type        = string
-  
 }
 
 variable "db_engine_version" {
   default = "8.0.33"
-  type        = string
-  
+  type        = string 
 }
 
 variable "vpc_tags" {
   default = {
      Name= "My_tag"
   }
-  
 }
 
 variable "instance_class" {
@@ -57,19 +50,16 @@ variable "db_name" {
   default = "laravel"
   type        = string
   sensitive = true
-  
 }
 
 variable "db_pw" {
   default = "qwerty12"
   type        = string
   sensitive = true
-  
 }
 
 variable "db_username" {
   default = "root"
   type        = string
-  sensitive = true
-  
+  sensitive = true 
 }

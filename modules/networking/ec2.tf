@@ -1,4 +1,8 @@
 
+################################################################################
+# EC2 instance
+################################################################################
+
 #Create aws instance in each subnet
 resource "aws_instance" "main" {
     ami= data.aws_ami.amazon-linux-2-latest.image_id
@@ -53,7 +57,7 @@ resource "aws_instance" "main" {
 resource "aws_security_group" "allow_tls" {
   name        = "allow_tls"
   description = "Allow TLS inbound traffic"
-  vpc_id      = aws_vpc.main.id
+  vpc_id      = aws_vpc.this_vpc.id
 
   ingress {
      from_port = 80
