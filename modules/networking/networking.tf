@@ -25,7 +25,7 @@ resource "aws_subnet" "db" {
 } 
 
 ################################################################################
-# Create Public Subnet 
+# Create Public Subnet (For Application tier)
 ################################################################################
 
 # Create Public Subnet
@@ -40,7 +40,7 @@ resource "aws_subnet" "public" {
 }
 
 ################################################################################
-# Create Private Subnet 
+# Create Private Subnet (For Web tier)
 ################################################################################
 
 # Create Private Subnet
@@ -55,7 +55,7 @@ resource "aws_subnet" "private" {
 }
 
 ################################################################################
-# Create Internet Gateway
+# Create Internet Gateway  (For Application tier)
 ################################################################################
 
 # Create IGW
@@ -63,27 +63,25 @@ resource "aws_internet_gateway" "main" {
   vpc_id =aws_vpc.this_vpc.id 
 }
 ##################################################
-# Create Nat-Gateway
+# Create Nat-Gateway (For Web tier)
 ################################################################################
 
-
 resource "aws_nat_gateway" "this" {
-  connectivity_type = "private"
-  # allocation_id = aws_eip.nat_eip.id
+  # connectivity_type = "private"
+  allocation_id = aws_eip.nat_eip.id
   #aws_eip
   # count=length(var.priv_ciders) 
   subnet_id =  aws_subnet.private[0].id
 }
 
 ################################################################################
-# Create Public Route Table
+# Create Public Route Table (For Application tier)
 ################################################################################
 
 # Create public Route Table 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this_vpc.id
 
-# Attach route table with IGW
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main.id
@@ -95,12 +93,12 @@ resource "aws_route_table" "public" {
 }
 
 ################################################################################
-# Create Private Route Table
+# Create Private Route Table (For Web tier)
 ################################################################################
 
-# Create private Route Table 
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this_vpc.id
+
   route {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.this.id
@@ -109,37 +107,25 @@ resource "aws_route_table" "private" {
     Name = "private-route-table"
   }
 }
-################################################################################
-# Associate Route-Table (private)
-################################################################################
-resource "aws_route_table_association" "private_route_table_association" {
-  route_table_id = aws_route_table.private.id
-  count=length(var.priv_ciders) 
-  subnet_id =  aws_subnet.private[count.index].id
-}
-
-
 
 ################################################################################
-# Associate Route-Table (public)
+# Associate Route-Table (With the web tier public subnets)
 ################################################################################
 
-# Associate route-Table with public subnet
 resource "aws_route_table_association" "public" {
   count = length(var.pub_ciders)
   subnet_id      = local.pub_sub_ids[count.index]  
   route_table_id = aws_route_table.public.id
 }
 
+################################################################################
+# Associate Route-Table (With the web tier private subnets)
+################################################################################
 
+resource "aws_route_table_association" "private_route_table_association" {
+  route_table_id = aws_route_table.private.id
+  count=length(var.priv_ciders) 
+  subnet_id =  aws_subnet.private[count.index].id
+}
 
 resource "aws_eip" "nat_eip" {}
-
-# Create a route in the private route table to send traffic through the NAT gateway
-# resource "aws_route" "private_subnet_route" {
-
-#   route_table_id         = aws_route_table.private.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   nat_gateway_id         = aws_nat_gateway.this.id
-# }
-

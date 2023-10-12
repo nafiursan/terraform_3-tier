@@ -1,10 +1,10 @@
 
 ################################################################################
-# Application Load balancer
+# Application Load balancer (app-tier)
 ################################################################################
 
-resource "aws_lb" "test" {
-  name               = "test-lb-tf"
+resource "aws_lb" "app_alb" {
+  name               = "app-alb"
   internal           = false
   load_balancer_type = "application"
   security_groups    = [ aws_security_group.allow_alb.id ]
@@ -17,42 +17,42 @@ resource "aws_lb" "test" {
 }
 
 ################################################################################
-# Load Balancer Listener 
+# Load Balancer Listener  (app-tier)
 ################################################################################
 
-resource "aws_lb_listener" "tf_alb_listener" {
-  load_balancer_arn = aws_lb.test.arn
+resource "aws_lb_listener" "app_alb_listener" {
+  load_balancer_arn = aws_lb.app_alb.arn
   port              = var.port
   protocol          = "HTTP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.test.arn
+    target_group_arn = aws_lb_target_group.app_tg.arn
   }
 }
 
 ################################################################################
-# Target Group of the Load Balancer
+# Target Group of the Load Balancer (app-tier)
 ################################################################################
 
-resource "aws_lb_target_group" "test" {
-  name     = "tf-example-lb-tg"
+resource "aws_lb_target_group" "app_tg" {
+  name     = "app-lb-tg"
   port     = var.port
   protocol = "HTTP"
   vpc_id   = aws_vpc.this_vpc.id
 }
 
 ################################################################################
-# Load Balancer - Target Group Attachment
+# Load Balancer - Target Group Attachment (app-tier)
 ################################################################################
-# Create a new ALB Target Group attachment
-resource "aws_autoscaling_attachment" "example" {
-  autoscaling_group_name = aws_autoscaling_group.bar.id
-  lb_target_group_arn    = aws_lb_target_group.test.arn
+
+resource "aws_autoscaling_attachment" "app_asg_attachment" {
+  autoscaling_group_name = aws_autoscaling_group.app_asg.id
+  lb_target_group_arn    = aws_lb_target_group.app_tg.arn
 }
 
 ################################################################################
-# Security Group
+# Security Group (app-tier)
 ################################################################################
 
 resource "aws_security_group" "allow_alb" {
@@ -60,6 +60,12 @@ resource "aws_security_group" "allow_alb" {
   description = "Allow alb inbound traffic"
   vpc_id      = aws_vpc.this_vpc.id
 
+  ingress {
+     from_port = 443
+     to_port = 443
+     protocol = "tcp"
+     cidr_blocks = ["0.0.0.0/0"]
+  }
   ingress {
      from_port = 80
      to_port = 80

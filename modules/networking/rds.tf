@@ -3,7 +3,7 @@
 # RDS Instance
 ################################################################################
 
-resource "aws_db_instance" "example" {
+resource "aws_db_instance" "db_instance" {
   allocated_storage = var.db_allocated_space
   engine = var.db_engine
   engine_version = var.db_engine_version
@@ -25,7 +25,7 @@ resource "aws_db_instance" "example" {
 ################################################################################
 
 resource "aws_db_subnet_group" "default" {
-  name       = "main"
+  name       = "db_subnet_group"
   subnet_ids = [for subnet in aws_subnet.db : subnet.id]
 
   tags = {

@@ -1,6 +1,6 @@
 
 data "aws_availability_zones" "az" {
-    state = "available"
+  state = "available"
 }
 
 data "aws_ami" "amazon-linux-2-latest" {

@@ -11,15 +11,15 @@ output "db_sub_ids" {
 }
 
 output "ALB_dns" {
-  value = aws_lb.test.dns_name
+  value = aws_lb.app_alb.dns_name
 }
 
 output "db_endpoint" {
-  value = aws_db_instance.example.address
+  value = aws_db_instance.db_instance.address
 }
 
 output "db_port" {
-    value = aws_db_instance.example.port
+    value = aws_db_instance.db_instance.port
 }
 
 output "azs" {
