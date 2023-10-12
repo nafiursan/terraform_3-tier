@@ -19,9 +19,11 @@ resource "aws_subnet" "db" {
     count=length(var.db_ciders) 
     cidr_block = var.db_ciders[count.index]
     availability_zone = local.azs[count.index]
+    
     tags ={
       Name = "db-${count.index + 1}" 
-    }   
+    }
+
 } 
 
 ################################################################################
@@ -34,9 +36,11 @@ resource "aws_subnet" "public" {
     count=length(var.pub_ciders) 
     cidr_block = var.pub_ciders[count.index]
     availability_zone = local.azs[count.index]
+
     tags ={
       Name = "Public-${count.index + 1}" 
-    }   
+    }
+
 }
 
 ################################################################################
@@ -49,28 +53,27 @@ resource "aws_subnet" "private" {
     count=length(var.priv_ciders) 
     cidr_block = var.priv_ciders[count.index]
     availability_zone = local.azs[count.index]
+
     tags ={
       Name = "Private-${count.index + 1}" 
-    }   
+    }
+
 }
 
 ################################################################################
 # Create Internet Gateway  (For Application tier)
 ################################################################################
 
-# Create IGW
 resource "aws_internet_gateway" "main" {
   vpc_id =aws_vpc.this_vpc.id 
 }
+
 ##################################################
 # Create Nat-Gateway (For Web tier)
 ################################################################################
 
 resource "aws_nat_gateway" "this" {
-  # connectivity_type = "private"
-  allocation_id = aws_eip.nat_eip.id
-  #aws_eip
-  # count=length(var.priv_ciders) 
+  allocation_id = aws_eip.nat_eip.id 
   subnet_id =  aws_subnet.private[0].id
 }
 
@@ -90,6 +93,7 @@ resource "aws_route_table" "public" {
   tags = {
     Name = "public-route-table"
   }
+
 }
 
 ################################################################################
@@ -103,9 +107,11 @@ resource "aws_route_table" "private" {
     cidr_block = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.this.id
   }
+  
   tags = {
     Name = "private-route-table"
   }
+
 }
 
 ################################################################################
